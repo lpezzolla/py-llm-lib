@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+
+from src.models.query_models import QueryPayload, QueryOutput
 from src.utils.logger import get_logger
 from typing import Any, Dict
 
@@ -19,7 +21,7 @@ class LLMClient(ABC):
         pass
 
     @abstractmethod
-    def query(self, prompt: str) -> str:
+    def query(self, payload: QueryPayload) -> QueryOutput:
         """Interact with the LLM using the given prompt"""
         pass
 

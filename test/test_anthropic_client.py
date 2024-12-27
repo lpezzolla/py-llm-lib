@@ -1,6 +1,10 @@
 import re
 import pytest
 from unittest.mock import patch
+
+from pydantic_core._pydantic_core import ValidationError
+
+from src.models.query_models import QueryPayload, QueryOutput
 from test.mocks.anthropic_mock_client import AnthropicMockClient
 
 EXPECTED_RESPONSE = open('test/fixtures/anthropic-response.md').read()
@@ -15,15 +19,27 @@ def test_query_with_loaded_model():
     """Test querying the model after it is loaded"""
     client = AnthropicMockClient()
     client.load_model()
-    prompt = "What is the meaning of life?"
-    response = client.query(prompt)
-    assert response == EXPECTED_RESPONSE, "Response should match the expected mock output."
+
+    payload = QueryPayload(prompt="What is the meaning of life?", user_id="42")
+    output = client.query(payload)
+
+    assert isinstance(output, QueryOutput)
+    assert output.response == EXPECTED_RESPONSE, "Response should match the expected mock output."
+
+def test_query_with_loaded_model_but_invalid_payload():
+    """Test querying the model after it is loaded, without including the user_id"""
+    client = AnthropicMockClient()
+    client.load_model()
+    with pytest.raises(ValidationError):
+        payload = QueryPayload(prompt="What is the meaning of life?")
+        client.query(payload)
 
 def test_query_without_loading_model():
     """Test querying the model before loading it, expecting an error"""
     client = AnthropicMockClient()
+    payload = QueryPayload(prompt="What is the meaning of life?", user_id="42")
     with pytest.raises(RuntimeError, match=re.escape("Model not loaded. Call load_model() first.")):
-        client.query("What is the meaning of life?")
+        client.query(payload)
 
 def test_handle_error():
     """Test the error handling mechanism"""
