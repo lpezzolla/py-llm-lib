@@ -1,0 +1,1 @@
+The expected response from the Anthropic mock client

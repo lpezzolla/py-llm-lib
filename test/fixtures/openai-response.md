@@ -1,0 +1,1 @@
+The expected response from the OpenAI mock client

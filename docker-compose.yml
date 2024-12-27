@@ -1,0 +1,8 @@
+services:
+  py-llm-lib:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tests_container
+    command: ["pytest", "--maxfail=1", "--disable-warnings", "/app/test"]
+    tty: true
